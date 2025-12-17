@@ -153,3 +153,31 @@ h1, h2, h3 {
 .table-responsive::-webkit-scrollbar-thumb:hover {
     background: var(--astra-blue);
 }
+
+/* --- ULTIMATE TABLE DATA VISIBILITY FIX --- */
+
+/* Force all table body text to be bright white */
+.table tbody td {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    vertical-align: middle;
+}
+
+/* Ensure the table headers stand out in Blue */
+.table thead th {
+    color: var(--astra-blue) !important;
+    background-color: #1a1f26 !important;
+    border-bottom: 2px solid var(--astra-border) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
+
+/* Fix for row hovering: make the row slightly lighter so text stays visible */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Ensure borders are visible but subtle */
+.table td, .table th {
+    border-color: var(--astra-border) !important;
+}

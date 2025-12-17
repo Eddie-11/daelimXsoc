@@ -1,38 +1,40 @@
 import os
-import io
-import base64
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
-from werkzeug.utils import secure_filename
 
-# --- CONFIGURATION ---
+# 1. Load environment variables from .env
 load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "astrasemi_secret_key"
+
+# 2. Initialize OpenAI Client
+# This will try to grab the key, but we handle the error later if it fails
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Use a temporary folder for image uploads
-UPLOAD_FOLDER = 'data/uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 def is_api_ready():
-    return os.getenv("OPENAI_API_KEY") is not None
+    """Helper to check if the API key is present and looks valid."""
+    key = os.getenv("OPENAI_API_KEY")
+    return key is not None and key.startswith("sk-")
 
-# --- HELPER FUNCTIONS ---
-
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
-
-# --- ROUTES ---
+# --- NAVIGATION ROUTES ---
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# MODULE 1: Operations Overview (CSV Upload & Summary)
+@app.route('/interpreter')
+def interpreter_page():
+    return render_template('interpreter.html')
+
+@app.route('/identifier')
+def identifier_page():
+    # Placeholder for Module 3
+    return render_template('identifier.html')
+
+# --- MODULE 1: OPERATIONS LOGIC ---
+
 @app.route('/operations', methods=['GET', 'POST'])
 def operations():
     shipments = []
@@ -41,39 +43,65 @@ def operations():
     if request.method == 'POST':
         file = request.files.get('csv_file')
         if file and file.filename.endswith('.csv'):
-            df = pd.read_csv(file)
-            shipments = df.to_dict(orient='records')
+            try:
+                # Read the CSV
+                df = pd.read_csv(file)
+                shipments = df.to_dict(orient='records')
+                
+                if is_api_ready():
+                    # LIVE API CALL
+                    csv_context = df.head(10).to_string()
+                    prompt = f"Analyze this data:\n{csv_context}\nProvide: 1. Main Points, 2. Anomalies, 3. Top 3 Priorities."
+                    
+                    response = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=[
+                            {"role": "system", "content": "You are an AstraSemi Ops Expert."},
+                            {"role": "user", "content": prompt}
+                        ]
+                    )
+                    analysis = response.choices[0].message.content
+                else:
+                    # FALLBACK TO MOCK
+                    analysis = "### [MOCK MODE] Analysis\n- **Main:** 10 shipments found.\n- **Unusual:** SHP002 is flagged 'Delayed'.\n- **Top 3:** 1. Update logs, 2. Contact carrier, 3. Verify stock."
             
-            # Prepare context for AI
-            csv_sample = df.head(10).to_string()
-            prompt = f"Analyze this semiconductor shipment data:\n{csv_sample}\nProvide: 1. Main Points, 2. Unusual findings/Anomalies, 3. Top 3 Priorities for a new employee."
-
-            if is_api_ready():
-                response = client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=[{"role": "system", "content": "You are an AstraSemi Ops Expert."},
-                              {"role": "user", "content": prompt}]
-                )
-                analysis = response.choices[0].message.content
-            else:
-                analysis = "### MOCK ANALYSIS\n- **Main:** 10 active shipments.\n- **Unusual:** SHP002 is delayed.\n- **Top 3:** 1. Check Austin log, 2. Confirm yield, 3. Update status."
-
+            except Exception as e:
+                # Catch Authentication or Data errors
+                analysis = f"⚠️ **System Note:** Could not reach AI. Please check your API key or CSV format. (Error: {str(e)})"
+    
     return render_template('operations.html', shipments=shipments, analysis=analysis)
 
-# MODULE 2: Document Interpreter (Text Snippets)
+# --- MODULE 2: INTERPRETER LOGIC ---
+
 @app.route('/api/interpret', methods=['POST'])
-def interpret():
-    user_text = request.json.get("text", "")
+def api_interpret():
+    data = request.json
+    user_text = data.get("text", "")
+    mode = data.get("mode", "summary")
+    
+    prompts = {
+        "summary": "Simplify this AstraSemi log for a trainee. Use beginner-friendly language.",
+        "email": "Convert this log into a professional email for a department head.",
+        "manager": "Summarize this for a manager's daily update focusing on impact."
+    }
     
     if is_api_ready():
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "system", "content": "Simplify this semiconductor log for a trainee. Use simple words and highlight risks."},
-                      {"role": "user", "content": user_text}]
-        )
-        return jsonify({"analysis": response.choices[0].message.content})
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": prompts.get(mode)},
+                    {"role": "user", "content": user_text}
+                ]
+            )
+            return jsonify({"analysis": response.choices[0].message.content})
+        except Exception as e:
+            return jsonify({"analysis": f"⚠️ Authentication Error: {str(e)}"})
     
-    return jsonify({"analysis": f"MOCK: '{user_text}' interpreted as 'Normal operating procedure. No risks detected.'" })
+    return jsonify({"analysis": f"**[MOCK {mode.upper()}]**\nEverything looks operational. Proceed with standard protocol."})
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 # MODULE 3: Image Identifier (Wafer/Tool Vision)
 @app.route('/api/identify', methods=['POST'])
