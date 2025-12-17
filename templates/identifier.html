@@ -7,8 +7,65 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <title>Image Identifier | AstraSemi</title>
+
+    <style>
+        /* FAIL-SAFE STYLES: High Visibility Dark Mode */
+        body { background-color: #0d1117 !important; color: #ffffff !important; }
+        
+        /* Upload & Preview Styles */
+        .upload-card {
+            border: 2px dashed #30363d !important;
+            background-color: #161b22 !important;
+            transition: 0.3s;
+        }
+        .upload-card:hover { border-color: #007bff !important; }
+
+        #imgPreview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Result Area */
+        .result-box {
+            background-color: #000000;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .analysis-text {
+            color: #e6edf3 !important;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        /* Input Styling */
+        input[type="file"].form-control {
+            color: #ffffff !important;
+            background-color: #0d1117 !important;
+            border: 1px solid #30363d !important;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background-color: #007bff !important;
+            color: white !important;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem;
+        }
+
+        .disclaimer {
+            font-size: 0.8rem;
+            color: #8b949e;
+            font-style: italic;
+        }
+    </style>
 </head>
-<body class="bg-dark text-light">
+<body class="bg-dark">
 
     <nav class="navbar border-bottom border-secondary p-3">
         <div class="container-fluid">
@@ -21,38 +78,45 @@
         <div class="row g-4">
             
             <div class="col-12 col-lg-5">
-                <div class="card p-4 h-100 border-secondary bg-black">
+                <div class="card p-4 h-100 upload-card">
                     <h4 class="text-white mb-3">Upload Image</h4>
-                    <p class="text-secondary small">Upload a photo of a wafer, FOUP, or component.</p>
+                    <p class="text-secondary small">Snap or upload a photo of a semiconductor component (Wafer, FOUP, Mask, etc.)</p>
                     
-                    <div class="mb-3">
-                        <input type="file" id="imageInput" class="form-control bg-dark text-white border-secondary mb-3" accept="image/*" onchange="previewImage(event)">
+                    <div class="mb-4">
+                        <input type="file" id="imageInput" class="form-control" accept="image/*" onchange="previewImage(event)">
                     </div>
 
-                    <div id="previewContainer" class="text-center mb-3 d-none">
-                        <img id="imgPreview" src="#" alt="Preview" class="img-fluid rounded border border-secondary shadow-sm" style="max-height: 300px;">
+                    <div id="previewWrapper" class="text-center d-none mb-4">
+                        <p class="text-primary small fw-bold mb-2">IMAGE PREVIEW</p>
+                        <img id="imgPreview" src="#" alt="Preview">
                     </div>
                     
-                    <button onclick="identifyImage()" class="btn btn-primary w-100 py-2 mt-auto">
-                        <i class="bi bi-search me-2"></i>Identify Component
+                    <button id="analyzeBtn" onclick="identifyImage()" class="btn btn-primary w-100 py-2 mt-auto">
+                        <i class="bi bi-search me-2"></i>Analyze Component
                     </button>
                 </div>
             </div>
 
             <div class="col-12 col-lg-7">
-                <div id="resultCard" class="card p-4 h-100 border-primary bg-black shadow-lg d-none">
-                    <h4 class="text-primary mb-3">AI Vision Analysis</h4>
-                    <hr class="border-secondary">
-                    <div id="visionOutput" class="analysis-text">
-                        </div>
-                    <div class="mt-4 pt-3 border-top border-secondary">
-                        <small class="text-muted italic">This explanation is general and not a technical assessment.</small>
+                <div id="resultCard" class="card h-100 border-secondary bg-dark overflow-hidden">
+                    <div class="card-header bg-dark border-secondary py-3">
+                        <h5 class="mb-0 text-white"><i class="bi bi-robot me-2"></i>AI Analysis Report</h5>
                     </div>
-                </div>
+                    <div class="card-body p-0">
+                        <div id="visionPlaceholder" class="p-5 text-center">
+                            <i class="bi bi-camera fs-1 text-secondary mb-3"></i>
+                            <p class="text-secondary">Please upload an image to see the identification details and process role.</p>
+                        </div>
 
-                <div id="visionPlaceholder" class="card p-5 h-100 border-secondary bg-transparent border-dashed d-flex align-items-center justify-content-center text-center">
-                    <i class="bi bi-camera fs-1 text-secondary mb-3"></i>
-                    <p class="text-secondary">Image details and role in the semiconductor process will appear here.</p>
+                        <div id="visionContent" class="result-box d-none">
+                            <div id="visionOutput" class="analysis-text text-white">
+                                </div>
+                            <div class="mt-4 pt-3 border-top border-secondary disclaimer">
+                                <i class="bi bi-info-circle me-1"></i>
+                                This explanation is general and not a technical assessment.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -60,35 +124,57 @@
     </div>
 
     <script>
+        // Preview the image immediately after selection
         function previewImage(event) {
             const reader = new FileReader();
             reader.onload = function(){
                 const output = document.getElementById('imgPreview');
                 output.src = reader.result;
-                document.getElementById('previewContainer').classList.remove('d-none');
+                document.getElementById('previewWrapper').classList.remove('d-none');
                 document.getElementById('visionPlaceholder').classList.add('d-none');
+                document.getElementById('visionContent').classList.add('d-none');
             };
             reader.readAsDataURL(event.target.files[0]);
         }
 
+        // Send image to backend API
         async function identifyImage() {
             const fileInput = document.getElementById('imageInput');
-            if (fileInput.files.length === 0) return alert("Please select an image first!");
+            if (fileInput.files.length === 0) {
+                alert("Please select an image first!");
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            const output = document.getElementById('visionOutput');
+            const content = document.getElementById('visionContent');
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analyzing...';
+            content.classList.remove('d-none');
+            output.innerHTML = '<p class="text-info">Scanning image against AstraSemi database...</p>';
 
             const formData = new FormData();
             formData.append('image', fileInput.files[0]);
 
-            // UI Feedback
-            document.getElementById('resultCard').classList.remove('d-none');
-            document.getElementById('visionOutput').innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+            try {
+                const response = await fetch('/api/identify', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const response = await fetch('/api/identify', {
-                method: 'POST',
-                body: formData
-            });
+                if (!response.ok) throw new Error('Network error');
 
-            const data = await response.json();
-            document.getElementById('visionOutput').innerHTML = data.analysis.replace(/\n/g, '<br>');
+                const data = await response.json();
+                // Replace newlines with breaks for better formatting
+                output.innerHTML = data.analysis.replace(/\n/g, '<br>');
+            } catch (err) {
+                output.innerHTML = '<p class="text-danger">⚠️ Error connecting to AI. Please check your API key and connection.</p>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-search me-2"></i>Analyze Component';
+            }
         }
     </script>
 </body>

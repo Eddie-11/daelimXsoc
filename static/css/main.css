@@ -181,3 +181,16 @@ h1, h2, h3 {
 .table td, .table th {
     border-color: var(--astra-border) !important;
 }
+
+/* --- Image Identification Styles --- */
+
+#imgPreview {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid var(--astra-border);
+    background-color: #000;
+}
+
+.italic {
+    font-style: italic;
+}

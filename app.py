@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
+import base64
 
 # 1. Load environment variables from .env
 load_dotenv()
@@ -104,30 +105,44 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 # MODULE 3: Image Identifier (Wafer/Tool Vision)
-@app.route('/api/identify', methods=['POST'])
-def identify():
-    file = request.files.get('image')
-    if not file:
-        return jsonify({"error": "No image"}), 400
-    
-    filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
-    file.save(filepath)
-    
-    if is_api_ready():
-        base64_img = encode_image(filepath)
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Identify this semiconductor part or wafer. List any visible defects or important features for a new employee."},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_img}"}}
-                ]
-            }]
-        )
-        return jsonify({"analysis": response.choices[0].message.content})
 
-    return jsonify({"analysis": "MOCK: Image identified as a 'Silicon Wafer (Type-P)'. Surface looks clear."})
+def encode_image(image_file):
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# --- MODULE 3: VISION LOGIC ---
+
+@app.route('/api/identify', methods=['POST'])
+def api_identify():
+    if 'image' not in request.files:
+        return jsonify({"analysis": "No image uploaded."}), 400
+    
+    image_file = request.files['image']
+    base64_image = encode_image(image_file)
+
+    if is_api_ready():
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": "Identify this semiconductor object for a new trainee. Explain what it is, its usage, and its role in the process. Use simple language."},
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+                            },
+                        ],
+                    }
+                ],
+                max_tokens=300,
+            )
+            return jsonify({"analysis": response.choices[0].message.content})
+        except Exception as e:
+            return jsonify({"analysis": f"⚠️ Vision API Error: {str(e)}"})
+    
+    # Mock Response
+    return jsonify({"analysis": "**[MOCK VISION]**\n\n**Object:** Silicon Wafer\n**Usage:** The base substrate for microchips.\n**Role:** It acts as the 'canvas' where circuits are printed using light."})
 
 if __name__ == '__main__':
     app.run(debug=True)
