@@ -1,0 +1,155 @@
+/* --- Global Theme --- */
+:root {
+    --astra-blue: #007bff;
+    --astra-dark: #0d1117;
+    --astra-card: #161b22;
+    --astra-border: #30363d;
+    --astra-text-muted: #8b949e;
+    --astra-success: #238636;
+}
+
+body {
+    background-color: var(--astra-dark);
+    color: #c9d1d9;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+}
+
+/* --- Navigation --- */
+.navbar {
+    background-color: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--astra-border) !important;
+}
+
+/* --- Card Design --- */
+.card {
+    background-color: var(--astra-card);
+    border: 1px solid var(--astra-border);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    border-color: var(--astra-blue);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.2);
+}
+
+/* --- Typography --- */
+h1, h2, h3 {
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.text-primary {
+    color: var(--astra-blue) !important;
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    background-color: var(--astra-blue);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* --- Table Styling (For Operations Module) --- */
+.table {
+    color: #c9d1d9;
+}
+
+.table thead th {
+    background-color: #1f242c;
+    border-bottom: 2px solid var(--astra-border);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* --- Dashboard Specific --- */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: var(--astra-success);
+    box-shadow: 0 0 8px var(--astra-success);
+}
+
+/* --- Responsive Adjustments --- */
+
+/* For Tablet and Mobile */
+@media (max-width: 768px) {
+    h1 { font-size: 1.8rem; }
+    .display-4 { font-size: 2.2rem; }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    /* Make the upload zone more compact on mobile */
+    .border-dashed {
+        padding: 2rem !important;
+    }
+    
+    .input-group.w-50 {
+        width: 90% !important; /* Wider input on small screens */
+    }
+}
+
+/* Ensure the table doesn't disappear on tiny screens */
+.table-responsive {
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+}
+
+/* --- Missing Module-Specific Styles --- */
+
+/* The Upload Zone "Dashed" Look */
+.border-dashed {
+    border: 2px dashed var(--astra-border) !important;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: border-color 0.3s;
+}
+
+.border-dashed:hover {
+    border-color: var(--astra-blue) !important;
+}
+
+/* AI Summary Formatting */
+.analysis-text {
+    color: #e6edf3;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+/* Highlighting specific AI terms (Bold text from Markdown) */
+.analysis-text strong, .analysis-text b {
+    color: var(--astra-blue);
+    font-weight: 600;
+}
+
+/* Customizing Scrollbars for the Data Table */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--astra-dark);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--astra-border);
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--astra-blue);
+}
