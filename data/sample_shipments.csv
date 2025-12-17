@@ -1,0 +1,4 @@
+id,destination,status,quantity
+SHP001,Singapore-Hub,On Time,5000
+SHP002,Austin-TX,Delayed,1200
+SHP003,Taiwan-SMC,On Time,8500

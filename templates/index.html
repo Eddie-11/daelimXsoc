@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstraSemi Intelligence Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="bg-dark text-light">
+
+    <nav class="navbar border-bottom border-secondary py-3 px-4">
+        <div class="container-fluid">
+            <span class="navbar-brand text-primary fw-bold fs-3">ASTRA<span class="text-white">SEMI</span> <span class="badge bg-primary ms-2 fs-6">AI HUB</span></span>
+            <div class="d-flex align-items-center">
+                <div class="spinner-grow text-success spinner-grow-sm me-2" role="status"></div>
+                <small class="text-secondary">System Ready</small>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold">Command Center</h1>
+            <p class="lead text-secondary">Advanced AI Assistance for Semiconductor Operations</p>
+        </header>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+            
+            <div class="col">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="fs-1 mb-3">📊</div>
+                    <h3 class="h4 text-white">Operations Overview</h3>
+                    <p class="text-secondary small">Analyze shipment logs and factory updates using real-time data interpretation.</p>
+                    <a href="/operations" class="btn btn-primary mt-auto">View Dashboard</a>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="fs-1 mb-3">📄</div>
+                    <h3 class="h4 text-white">Document Interpreter</h3>
+                    <p class="text-secondary small">Simplify complex technician messages and logs into clear, actionable steps.</p>
+                    <a href="/interpreter" class="btn btn-primary mt-auto">Open Interpreter</a>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="fs-1 mb-3">🔍</div>
+                    <h3 class="h4 text-white">Image Identifier</h3>
+                    <p class="text-secondary small">AI-powered visual inspection for wafers, parts, and equipment tools.</p>
+                    <a href="/identifier" class="btn btn-primary mt-auto">Launch Vision</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="text-center mt-5 py-4 border-top border-secondary">
+        <p class="text-secondary small">&copy; 2024 AstraSemi Hackathon Team — Powered by GPT-4o</p>
+    </footer>
+
+</body>
+</html>
