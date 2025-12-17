@@ -6,9 +6,61 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <title>Doc Interpreter | AstraSemi</title>
+    <title>Document Interpreter | AstraSemi</title>
+
+    <style>
+        /* FAIL-SAFE STYLES: High Visibility Dark Mode */
+        body { background-color: #0d1117 !important; color: #ffffff !important; }
+        
+        /* Textarea and Card Customization */
+        .input-card {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
+
+        textarea.form-control {
+            background-color: #0d1117 !important;
+            color: #ffffff !important;
+            border: 1px solid #30363d !important;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        textarea.form-control::placeholder {
+            color: #8b949e !important;
+        }
+
+        /* Result Area */
+        .result-box {
+            background-color: #000000;
+            border-left: 4px solid #007bff;
+            padding: 25px;
+            min-height: 300px;
+        }
+
+        .analysis-text {
+            color: #e6edf3 !important;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* Highlights for AI bold text */
+        .analysis-text strong, .analysis-text b {
+            color: #007bff !important;
+            font-weight: 700;
+        }
+
+        .btn-outline-info {
+            color: #58a6ff !important;
+            border-color: #58a6ff !important;
+        }
+
+        .btn-outline-info:hover {
+            background-color: #58a6ff !important;
+            color: #ffffff !important;
+        }
+    </style>
 </head>
-<body class="bg-dark text-light">
+<body class="bg-dark">
 
     <nav class="navbar border-bottom border-secondary p-3">
         <div class="container-fluid">
@@ -20,38 +72,55 @@
     <div class="container py-5">
         <div class="row g-4">
             
-            <div class="col-12 col-lg-6">
-                <div class="card p-4 h-100 border-secondary bg-black">
+            <div class="col-12 col-lg-5">
+                <div class="card p-4 h-100 input-card shadow-lg">
                     <h4 class="text-white mb-3">Paste Technical Note</h4>
-                    <p class="text-secondary small">Enter logs, handover notes, or equipment alerts below.</p>
-                    <textarea id="userInput" class="form-control bg-dark text-white border-secondary mb-3" rows="8" placeholder="Example: 'Lot 402 held. Ch-B pressure spike @ 40mtorr. O-ring wear? Need PM asap.'"></textarea>
+                    <p class="text-secondary small">Enter messy technical logs, handover notes, or alerts below.</p>
                     
-                    <div class="d-grid gap-2">
-                        <button onclick="interpret('summary')" class="btn btn-primary">
+                    <textarea id="userInput" class="form-control mb-4" rows="10" 
+                        placeholder="e.g. 'Lot #992 held. Ch-A vacuum leak. 50mtorr spike. Safety interlock tripped. O-ring check needed.'"></textarea>
+                    
+                    <div class="d-grid gap-3">
+                        <button id="mainBtn" onclick="interpret('summary')" class="btn btn-primary py-2 fw-bold">
                             <i class="bi bi-magic me-2"></i>Simplify & Summarize
                         </button>
-                        <div class="btn-group w-100">
-                            <button onclick="interpret('email')" class="btn btn-outline-info">Professional Email</button>
-                            <button onclick="interpret('manager')" class="btn btn-outline-info">Manager Update</button>
+                        
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button onclick="interpret('email')" class="btn btn-outline-info w-100 btn-sm py-2">
+                                    <i class="bi bi-envelope me-1"></i>To Email
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button onclick="interpret('manager')" class="btn btn-outline-info w-100 btn-sm py-2">
+                                    <i class="bi bi-person-badge me-1"></i>To Manager
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-lg-6">
-                <div id="outputCard" class="card p-4 h-100 border-primary bg-black shadow-lg" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 id="outputTitle" class="text-primary mb-0">AI Interpretation</h4>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyText()"><i class="bi bi-clipboard"></i></button>
+            <div class="col-12 col-lg-7">
+                <div id="outputCard" class="card h-100 border-secondary bg-dark overflow-hidden shadow-lg">
+                    <div class="card-header bg-dark border-secondary py-3 d-flex justify-content-between align-items-center">
+                        <h5 id="outputTitle" class="mb-0 text-white"><i class="bi bi-stars me-2 text-primary"></i>AI Interpretation</h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyText()">
+                            <i class="bi bi-clipboard me-1"></i>Copy
+                        </button>
                     </div>
-                    <hr class="border-secondary">
-                    <div id="aiResult" class="analysis-text">
+                    
+                    <div class="card-body p-0">
+                        <div id="placeholder" class="p-5 text-center">
+                            <i class="bi bi-chat-left-dots fs-1 text-secondary mb-3"></i>
+                            <p class="text-secondary">Your AI-generated summary or professional draft will appear here.</p>
                         </div>
-                </div>
-                
-                <div id="placeholderCard" class="card p-5 h-100 border-secondary bg-transparent border-dashed d-flex align-items-center justify-content-center text-center">
-                    <i class="bi bi-chat-left-dots fs-1 text-secondary mb-3"></i>
-                    <p class="text-secondary">AI interpretation will appear here after you process the text.</p>
+
+                        <div id="resultContent" class="result-box d-none">
+                            <div id="aiResult" class="analysis-text">
+                                </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -61,33 +130,55 @@
     <script>
         async function interpret(mode) {
             const text = document.getElementById('userInput').value;
-            if (!text) return alert("Please paste some text first!");
+            if (!text) {
+                alert("Please paste some technical text first!");
+                return;
+            }
 
-            // UI Feedback
-            document.getElementById('placeholderCard').style.display = 'none';
-            document.getElementById('outputCard').style.display = 'block';
-            document.getElementById('aiResult').innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
-            
-            const response = await fetch('/api/interpret', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ text: text, mode: mode })
-            });
-            
-            const data = await response.json();
-            document.getElementById('aiResult').innerHTML = data.analysis.replace(/\n/g, '<br>');
-            
-            // Update Title based on mode
+            const btn = document.getElementById('mainBtn');
+            const output = document.getElementById('aiResult');
+            const placeholder = document.getElementById('placeholder');
+            const content = document.getElementById('resultContent');
+            const title = document.getElementById('outputTitle');
+
+            // UI Loading State
+            btn.disabled = true;
+            placeholder.classList.add('d-none');
+            content.classList.remove('d-none');
+            output.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-primary small">Processing with AstraSemi AI...</p></div>';
+
+            // Set Title based on mode
             const titles = {
                 'summary': 'Simplified Summary',
                 'email': 'Professional Email Draft',
                 'manager': 'Manager Update'
             };
-            document.getElementById('outputTitle').innerText = titles[mode];
+            title.innerHTML = `<i class="bi bi-stars me-2 text-primary"></i>${titles[mode]}`;
+
+            try {
+                const response = await fetch('/api/interpret', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ text: text, mode: mode })
+                });
+
+                if (!response.ok) throw new Error('Server Error');
+
+                const data = await response.json();
+                // Replace Markdown-style bold and newlines
+                let formatted = data.analysis.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                output.innerHTML = formatted.replace(/\n/g, '<br>');
+
+            } catch (err) {
+                output.innerHTML = '<p class="text-danger">⚠️ Analysis Failed. Check your API key and network connection.</p>';
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         function copyText() {
             const text = document.getElementById('aiResult').innerText;
+            if (!text) return;
             navigator.clipboard.writeText(text);
             alert("Copied to clipboard!");
         }
