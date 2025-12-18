@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
+import markdown as md
 import base64
 
 # 1. Load environment variables from .env
@@ -53,7 +54,7 @@ def operations():
                     # LIVE API CALL
                     csv_context = df.head(10).to_string()
                     prompt = f"Analyze this data:\n{csv_context}\nProvide: 1. Main Points, 2. Anomalies, 3. Top 3 Priorities."
-                    
+
                     response = client.chat.completions.create(
                         model="gpt-4o",
                         messages=[
@@ -62,15 +63,25 @@ def operations():
                         ]
                     )
                     analysis = response.choices[0].message.content
+                    # Convert markdown to HTML for safe rendering in the template
+                    try:
+                        analysis_html = md.markdown(analysis, extensions=["extra", "nl2br"])
+                    except Exception:
+                        analysis_html = analysis.replace("\n", "<br>")
                 else:
                     # FALLBACK TO MOCK
                     analysis = "### [MOCK MODE] Analysis\n- **Main:** 10 shipments found.\n- **Unusual:** SHP002 is flagged 'Delayed'.\n- **Top 3:** 1. Update logs, 2. Contact carrier, 3. Verify stock."
-            
+                    analysis_html = md.markdown(analysis, extensions=["extra", "nl2br"])
+
             except Exception as e:
                 # Catch Authentication or Data errors
                 analysis = f"⚠️ **System Note:** Could not reach AI. Please check your API key or CSV format. (Error: {str(e)})"
-    
-    return render_template('operations.html', shipments=shipments, analysis=analysis)
+                analysis_html = md.markdown(analysis)
+
+    # Ensure analysis_html is defined when template expects it
+    if analysis is None:
+        analysis_html = None
+    return render_template('operations.html', shipments=shipments, analysis=analysis, analysis_html=analysis_html)
 
 # --- MODULE 2: INTERPRETER LOGIC ---
 
