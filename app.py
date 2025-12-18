@@ -5,6 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import base64
 
+
 # 1. Load environment variables from .env
 load_dotenv()
 
@@ -101,9 +102,6 @@ def api_interpret():
     
     return jsonify({"analysis": f"**[MOCK {mode.upper()}]**\nEverything looks operational. Proceed with standard protocol."})
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 # MODULE 3: Image Identifier (Wafer/Tool Vision)
 
 def encode_image(image_file):
@@ -113,36 +111,18 @@ def encode_image(image_file):
 
 @app.route('/api/identify', methods=['POST'])
 def api_identify():
-    if 'image' not in request.files:
-        return jsonify({"analysis": "No image uploaded."}), 400
-    
     image_file = request.files['image']
-    base64_image = encode_image(image_file)
-
+    base64_img = encode_image(image_file)
     if is_api_ready():
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": "Identify this semiconductor object for a new trainee. Explain what it is, its usage, and its role in the process. Use simple language."},
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
-                            },
-                        ],
-                    }
-                ],
-                max_tokens=300,
-            )
-            return jsonify({"analysis": response.choices[0].message.content})
-        except Exception as e:
-            return jsonify({"analysis": f"⚠️ Vision API Error: {str(e)}"})
-    
-    # Mock Response
-    return jsonify({"analysis": "**[MOCK VISION]**\n\n**Object:** Silicon Wafer\n**Usage:** The base substrate for microchips.\n**Role:** It acts as the 'canvas' where circuits are printed using light."})
+        res = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": [
+                {"type": "text", "text": "What semiconductor part is this?"},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_img}"}}
+            ]}]
+        )
+        return jsonify({"analysis": res.choices[0].message.content})
+    return jsonify({"analysis": "[MOCK] This looks like a 300mm Silicon Wafer."})
 
 if __name__ == '__main__':
     app.run(debug=True)
