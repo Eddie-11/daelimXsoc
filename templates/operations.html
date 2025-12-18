@@ -41,7 +41,11 @@
                     </div>
                     <div class="card-body bg-black text-light p-4">
                         <div class="analysis-text" style="line-height: 1.8; font-size: 0.95rem;">
-                            {{ analysis | replace('\n', '<br>') | safe }}
+                            {% if analysis_html %}
+                                {{ analysis_html | safe }}
+                            {% else %}
+                                {{ analysis | replace('\n', '<br>') | safe }}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
