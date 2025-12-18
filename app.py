@@ -101,9 +101,6 @@ def api_interpret():
     
     return jsonify({"analysis": f"**[MOCK {mode.upper()}]**\nEverything looks operational. Proceed with standard protocol."})
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 # MODULE 3: Image Identifier (Wafer/Tool Vision)
 
 def encode_image(image_file):
