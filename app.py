@@ -145,12 +145,22 @@ def api_identify():
                 ],
                 max_tokens=300,
             )
-            return jsonify({"analysis": response.choices[0].message.content})
+            analysis = response.choices[0].message.content
+            # Convert markdown to HTML for proper rendering
+            try:
+                analysis_html = md.markdown(analysis, extensions=["extra", "nl2br"])
+            except Exception:
+                analysis_html = analysis.replace("\n", "<br>")
+            return jsonify({"analysis": analysis, "analysis_html": analysis_html})
         except Exception as e:
-            return jsonify({"analysis": f"⚠️ Vision API Error: {str(e)}"})
-    
+            error_text = f"⚠️ Vision API Error: {str(e)}"
+            error_html = md.markdown(error_text)
+            return jsonify({"analysis": error_text, "analysis_html": error_html})
+
     # Mock Response
-    return jsonify({"analysis": "**[MOCK VISION]**\n\n**Object:** Silicon Wafer\n**Usage:** The base substrate for microchips.\n**Role:** It acts as the 'canvas' where circuits are printed using light."})
+    mock_analysis = "**[MOCK VISION]**\n\n**Object:** Silicon Wafer\n**Usage:** The base substrate for microchips.\n**Role:** It acts as the 'canvas' where circuits are printed using light."
+    mock_html = md.markdown(mock_analysis, extensions=["extra", "nl2br"])
+    return jsonify({"analysis": mock_analysis, "analysis_html": mock_html})
 
 if __name__ == '__main__':
     app.run(debug=True)
