@@ -4,11 +4,31 @@ from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
 import base64
+import logging
 
 # 1. Load environment variables from .env
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Register error handlers
+from error_handler import register_error_handlers
+register_error_handlers(app)
+
+# Register API blueprints
+from quality_insight_api import quality_bp
+app.register_blueprint(quality_bp)
 
 # 2. Initialize OpenAI Client
 # This will try to grab the key, but we handle the error later if it fails
@@ -33,6 +53,11 @@ def interpreter_page():
 def identifier_page():
     # Placeholder for Module 3
     return render_template('identifier.html')
+
+@app.route('/quality-insight')
+def quality_insight_page():
+    """Quality Risk Insight Helper"""
+    return render_template('quality_insight.html')
 
 # --- MODULE 1: OPERATIONS LOGIC ---
 
@@ -142,4 +167,5 @@ def api_identify():
     return jsonify({"analysis": "**[MOCK VISION]**\n\n**Object:** Silicon Wafer\n**Usage:** The base substrate for microchips.\n**Role:** It acts as the 'canvas' where circuits are printed using light."})
 
 if __name__ == '__main__':
+    logger.info("Starting Flask server on http://localhost:5000")
     app.run(debug=True)
