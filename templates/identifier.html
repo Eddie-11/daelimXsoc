@@ -167,8 +167,8 @@
                 if (!response.ok) throw new Error('Network error');
 
                 const data = await response.json();
-                // Replace newlines with breaks for better formatting
-                output.innerHTML = data.analysis.replace(/\n/g, '<br>');
+                // Use the HTML-converted markdown from the backend
+                output.innerHTML = data.analysis_html || data.analysis.replace(/\n/g, '<br>');
             } catch (err) {
                 output.innerHTML = '<p class="text-danger">⚠️ Error connecting to AI. Please check your API key and connection.</p>';
             } finally {
