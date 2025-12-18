@@ -24,7 +24,15 @@ function fillExample(text) {
         'Humidity drift': 'Humidity slightly high in Zone C. Minor particle alert earlier. No visible defects observed.',
         'Particle alert': 'Particle count increased briefly in cleanroom. Returned to normal levels after 10 minutes.',
         'Tool vibration': 'Equipment showed unusual vibration during operation. No immediate impact on output quality.',
-        'Packaging scratch': 'Noticed minor scratch on packaging material. Contents appear unaffected.'
+        'Packaging scratch': 'Noticed minor scratch on packaging material. Contents appear unaffected.',
+        'Temperature spike': 'Temperature reading showed brief spike of 2 degrees above normal. Returned to baseline within 5 minutes. No impact on current batch.',
+        'Wafer discoloration': 'Observed slight discoloration on edge of wafer during visual inspection. Center area appears normal. No cracks visible.',
+        'Pressure drop': 'Differential pressure dropped below normal threshold for approximately 3 minutes. System auto-corrected. Monitoring continues.',
+        'Equipment noise': 'Unusual humming sound detected from processing equipment. Vibration levels normal. Output quality unchanged.',
+        'Surface contamination': 'Minor surface particles observed during routine inspection. Cleaned per standard procedure. No impact on process.',
+        'Calibration drift': 'Sensor readings showing slight drift from calibrated values. Within acceptable tolerance range. Scheduled for recalibration.',
+        'Material defect': 'Noticed small irregularity in raw material batch. Isolated affected units. Remaining materials appear standard quality.',
+        'Process variation': 'Process parameters varied slightly from standard settings. Output still within specification. Documented for review.'
     };
     
     textarea.value = examples[text] || text;
