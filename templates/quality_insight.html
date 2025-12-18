@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Risk Insight Helper | AstraSemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .quick-fill-chip {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 4px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .quick-fill-chip:hover {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        .risk-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        .risk-LOW { background-color: #238636; color: white; }
+        .risk-MEDIUM { background-color: #d29922; color: white; }
+        .risk-HIGH { background-color: #da3633; color: white; }
+        .insight-card {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .insight-card h6 {
+            color: #007bff;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .insight-card ul {
+            margin-bottom: 0;
+            padding-left: 1.5rem;
+        }
+        .insight-card li {
+            margin-bottom: 0.5rem;
+            color: #c9d1d9;
+        }
+        .disclaimer {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 3px solid #da3633;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+            color: #da3633;
+            font-size: 0.9rem;
+        }
+        #observationText {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
+    </style>
+</head>
+<body class="bg-dark text-light">
+    <nav class="navbar border-bottom border-secondary p-3">
+        <div class="container-fluid">
+            <a href="/" class="text-decoration-none"><span class="text-primary fw-bold">← BACK TO HUB</span></a>
+            <span class="navbar-text text-white fw-bold"><i class="bi bi-lightbulb me-2"></i>QUALITY RISK INSIGHT HELPER</span>
+        </div>
+    </nav>
+
+    <div class="container py-5" style="max-width: 900px;">
+        
+        <header class="text-center mb-5">
+            <h1 class="display-5 fw-bold mb-3">Quality Risk Insight Helper</h1>
+            <p class="lead text-secondary">Get beginner-friendly insights about your quality observations</p>
+        </header>
+
+        <!-- Quick Fill Chips -->
+        <div class="mb-4">
+            <label class="form-label text-secondary small mb-2">Quick Fill Examples:</label>
+            <div class="d-flex flex-wrap">
+                <span class="quick-fill-chip" onclick="fillExample('Humidity drift')">Humidity drift</span>
+                <span class="quick-fill-chip" onclick="fillExample('Particle alert')">Particle alert</span>
+                <span class="quick-fill-chip" onclick="fillExample('Tool vibration')">Tool vibration</span>
+                <span class="quick-fill-chip" onclick="fillExample('Packaging scratch')">Packaging scratch</span>
+                <span class="quick-fill-chip" onclick="fillExample('Temperature spike')">Temperature spike</span>
+                <span class="quick-fill-chip" onclick="fillExample('Wafer discoloration')">Wafer discoloration</span>
+                <span class="quick-fill-chip" onclick="fillExample('Pressure drop')">Pressure drop</span>
+                <span class="quick-fill-chip" onclick="fillExample('Equipment noise')">Equipment noise</span>
+                <span class="quick-fill-chip" onclick="fillExample('Surface contamination')">Surface contamination</span>
+                <span class="quick-fill-chip" onclick="fillExample('Calibration drift')">Calibration drift</span>
+                <span class="quick-fill-chip" onclick="fillExample('Material defect')">Material defect</span>
+                <span class="quick-fill-chip" onclick="fillExample('Process variation')">Process variation</span>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="card border-secondary mb-4">
+            <div class="card-body p-4">
+                <form id="insightForm">
+                    <div class="mb-4">
+                        <label for="observationText" class="form-label fw-bold">
+                            Quality or Process Observation
+                        </label>
+                        <textarea 
+                            class="form-control bg-dark text-light border-secondary" 
+                            id="observationText" 
+                            name="observationText"
+                            placeholder="e.g. 'Humidity slightly high in Zone C. Minor particle alert earlier. No visible defects observed.'"
+                            required
+                            minlength="20"
+                            maxlength="1000"
+                            rows="5"
+                        ></textarea>
+                        <div class="form-text text-secondary">
+                            <span id="charCount">0</span> / 1000 characters (minimum 20)
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="context" class="form-label fw-bold">
+                            Observation Context
+                        </label>
+                        <select 
+                            class="form-select bg-dark text-light border-secondary" 
+                            id="context" 
+                            name="context"
+                        >
+                            <option value="General process note" selected>General process note</option>
+                            <option value="Cleanroom environment">Cleanroom environment</option>
+                            <option value="Equipment condition">Equipment condition</option>
+                            <option value="Visual inspection">Visual inspection</option>
+                            <option value="Material handling">Material handling</option>
+                        </select>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary btn-lg w-100" 
+                        id="submitBtn"
+                    >
+                        <i class="bi bi-search me-2"></i>Get Quality Insight
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-5 d-none">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-secondary">Analyzing observation...</p>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="resultsPanel" class="d-none">
+            
+            <!-- Risk Level Badge -->
+            <div class="text-center mb-4">
+                <h5 class="text-secondary mb-2">Risk Level</h5>
+                <span id="riskBadge" class="risk-badge risk-MEDIUM">MEDIUM</span>
+            </div>
+
+            <!-- Simple Risk Interpretation -->
+            <div class="insight-card">
+                <h6><i class="bi bi-info-circle me-2"></i>Simple Risk Interpretation</h6>
+                <p id="riskInterpretation" class="mb-0 text-light"></p>
+            </div>
+
+            <!-- Key Points -->
+            <div class="insight-card">
+                <h6><i class="bi bi-list-check me-2"></i>Key Points (Beginner-Friendly)</h6>
+                <ul id="keyPoints" class="mb-0"></ul>
+            </div>
+
+            <!-- Suggested Actions -->
+            <div class="insight-card">
+                <h6><i class="bi bi-arrow-right-circle me-2"></i>Suggested Follow-Up Actions</h6>
+                <ul id="actions" class="mb-0"></ul>
+            </div>
+
+            <!-- Clarifying Questions -->
+            <div id="clarifyingQuestionsCard" class="insight-card d-none">
+                <h6><i class="bi bi-question-circle me-2"></i>What's Missing / Clarifying Questions</h6>
+                <ul id="clarifyingQuestions" class="mb-0"></ul>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Disclaimer:</strong> <span id="disclaimer"></span>
+            </div>
+
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="errorText"></span>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/quality_insight.js') }}"></script>
+</body>
+</html>
+
