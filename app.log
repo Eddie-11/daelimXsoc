@@ -1951,3 +1951,21 @@ TypeError: '>=' not supported between instances of 'str' and 'datetime.datetime'
 2025-12-18 14:33:46,681 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:33:46] "GET /static/js/quality_insight.js HTTP/1.1" 200 -
 2025-12-18 14:33:50,842 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:33:50] "GET / HTTP/1.1" 200 -
 2025-12-18 14:33:50,896 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:33:50] "[36mGET /static/css/main.css HTTP/1.1[0m" 304 -
+2025-12-18 14:41:05,054 - __main__ - INFO - Starting Flask server on http://localhost:5000
+2025-12-18 14:41:05,067 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-12-18 14:41:05,067 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-12-18 14:41:05,069 - werkzeug - INFO -  * Restarting with stat
+2025-12-18 14:41:06,324 - __main__ - INFO - Starting Flask server on http://localhost:5000
+2025-12-18 14:41:06,330 - werkzeug - WARNING -  * Debugger is active!
+2025-12-18 14:41:06,333 - werkzeug - INFO -  * Debugger PIN: 861-497-350
+2025-12-18 14:41:12,269 - error_handler - WARNING - 404 Not Found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-12-18 14:41:12,270 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:41:12] "[33mGET /api/overview HTTP/1.1[0m" 404 -
+2025-12-18 14:41:12,271 - error_handler - WARNING - 404 Not Found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-12-18 14:41:12,273 - error_handler - WARNING - 404 Not Found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-12-18 14:41:12,273 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:41:12] "[33mGET /api/sensors?zone=Zone-C&from=2025-12-17T06:41:12.257Z&to=2025-12-18T06:41:12.257Z HTTP/1.1[0m" 404 -
+2025-12-18 14:41:12,274 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:41:12] "[33mGET /api/risk?zone=Zone-C&from=2025-12-17T06:41:12.257Z&to=2025-12-18T06:41:12.257Z HTTP/1.1[0m" 404 -
+2025-12-18 14:41:12,276 - error_handler - WARNING - 404 Not Found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-12-18 14:41:12,277 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:41:12] "[33mGET /api/detections?zone=Zone-C&from=2025-12-17T06:41:12.257Z&to=2025-12-18T06:41:12.257Z HTTP/1.1[0m" 404 -
+2025-12-18 14:41:12,278 - error_handler - WARNING - 404 Not Found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-12-18 14:41:12,278 - werkzeug - INFO - 127.0.0.1 - - [18/Dec/2025 14:41:12] "[33mGET /api/correlation?from=2025-12-11T06:41:12.257Z&to=2025-12-18T06:41:12.257Z HTTP/1.1[0m" 404 -
